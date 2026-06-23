@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StockMgr — Sistema de Inventario</title>
+
+  <!-- Font Awesome: íconos -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Toastify: notificaciones (reemplaza alert) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css" />
+
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- ════════════════════════════════════════════════════════
+       HEADER
+  ════════════════════════════════════════════════════════ -->
+  <header class="hdr">
+    <div class="brand">
+      <div class="brand-dot"><i class="fas fa-warehouse"></i></div>
+      StockMgr
+    </div>
+    <div class="hdr-right">
+      <span><span class="pulse"></span> sistema activo</span>
+      <span id="hdrFecha"></span>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════════════════════════
+       SIDEBAR — Navegación principal
+  ════════════════════════════════════════════════════════ -->
+  <nav class="sidebar">
+    <div class="nav-lbl">Principal</div>
+    <div class="nav-item on" data-view="inventario">
+      <i class="fas fa-table-list"></i> Inventario
+    </div>
+    <div class="nav-item" data-view="dashboard">
+      <i class="fas fa-chart-bar"></i> Dashboard
+    </div>
+
+    <div class="sidebar-sep"></div>
+
+    <div class="nav-lbl">Gestión</div>
+    <div class="nav-item" data-view="alertas">
+      <i class="fas fa-triangle-exclamation"></i> Alertas
+      <span class="nav-badge" id="badgeAlertas" style="display:none"></span>
+    </div>
+    <div class="nav-item" data-view="historial">
+      <i class="fas fa-clock-rotate-left"></i> Historial
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════════════════
+       CONTENIDO PRINCIPAL
+  ════════════════════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- ── Vista: Inventario ───────────────────────────────── -->
+    <section id="view-inventario" class="view on">
+
+      <div class="pg-hdr">
+        <div>
+          <div class="pg-title">Inventario</div>
+          <div class="pg-sub">Gestión completa de productos y stock</div>
+        </div>
+        <div class="pg-actions">
+          <button class="btn btn-ghost" id="btnExportar">
+            <i class="fas fa-download"></i> Exportar CSV
+          </button>
+          <button class="btn btn-primary" id="btnNuevo">
+            <i class="fas fa-plus"></i> Nuevo producto
+          </button>
+        </div>
+      </div>
+
+      <!-- Tarjetas de estadísticas -->
+      <div class="stats">
+        <div class="stat s-blue">
+          <div class="stat-lbl">Total productos</div>
+          <div class="stat-val c-blue" id="stTotal">—</div>
+          <div class="stat-desc">en catálogo</div>
+        </div>
+        <div class="stat s-red">
+          <div class="stat-lbl">Sin stock</div>
+          <div class="stat-val c-red" id="stSin">—</div>
+          <div class="stat-desc">requieren reposición</div>
+        </div>
+        <div class="stat s-yellow">
+          <div class="stat-lbl">Stock bajo</div>
+          <div class="stat-val c-yellow" id="stBajo">—</div>
+          <div class="stat-desc">≤ 5 unidades</div>
+        </div>
+        <div class="stat s-green">
+          <div class="stat-lbl">Valor total</div>
+          <div class="stat-val c-green" id="stValor" style="font-size:17px">—</div>
+          <div class="stat-desc">precio × stock</div>
+        </div>
+      </div>
+
+      <!-- Barra de filtros -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <i class="fas fa-search"></i>
+          <input type="text" id="buscador" placeholder="Buscar por nombre o proveedor…" />
+        </div>
+        <select class="fil" id="filCat">
+          <option value="">Todas las categorías</option>
+          <option>Electrónica</option>
+          <option>Periféricos</option>
+          <option>Hardware</option>
+          <option>Almacenamiento</option>
+          <option>Redes</option>
+          <option>Accesorios</option>
+        </select>
+        <select class="fil" id="filStock">
+          <option value="">Todo el stock</option>
+          <option value="ok">Disponible</option>
+          <option value="low">Stock bajo</option>
+          <option value="out">Sin stock</option>
+        </select>
+      </div>
+
+      <!-- Tabla de productos -->
+      <div class="tbl-box">
+        <div class="tbl-info">
+          <span id="tblCounter">Cargando…</span>
+          <span>Clic en columna para ordenar</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th data-col="id">ID <i class="fas fa-sort sort-ico"></i></th>
+              <th data-col="nombre">Nombre <i class="fas fa-sort sort-ico"></i></th>
+              <th data-col="categoria">Categoría <i class="fas fa-sort sort-ico"></i></th>
+              <th data-col="proveedor">Proveedor <i class="fas fa-sort sort-ico"></i></th>
+              <th data-col="precio">Precio <i class="fas fa-sort sort-ico"></i></th>
+              <th data-col="stock">Stock <i class="fas fa-sort sort-ico"></i></th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tblBody">
+            <tr>
+              <td colspan="7" style="text-align:center;padding:48px;color:var(--txt-3)">
+                <i class="fas fa-spinner fa-spin" style="margin-right:8px"></i>
+                Cargando productos…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+    <!-- ── Vista: Dashboard ────────────────────────────────── -->
+    <section id="view-dashboard" class="view">
+
+      <div class="pg-hdr">
+        <div>
+          <div class="pg-title">Dashboard</div>
+          <div class="pg-sub">Análisis visual del inventario</div>
+        </div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="card">
+          <div class="card-title">Stock por categoría</div>
+          <div class="bar-chart" id="chartCat"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Top 5 por valor en inventario</div>
+          <div class="bar-chart" id="chartTop"></div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── Vista: Alertas ──────────────────────────────────── -->
+    <section id="view-alertas" class="view">
+
+      <div class="pg-hdr">
+        <div>
+          <div class="pg-title">Alertas</div>
+          <div class="pg-sub">Productos con stock crítico que requieren atención</div>
+        </div>
+      </div>
+
+      <div class="alert-list" id="alertList">
+        <div class="empty">
+          <i class="fas fa-spinner fa-spin"></i>
+          <p>Cargando alertas…</p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── Vista: Historial ────────────────────────────────── -->
+    <section id="view-historial" class="view">
+
+      <div class="pg-hdr">
+        <div>
+          <div class="pg-title">Historial</div>
+          <div class="pg-sub">Registro de todas las operaciones realizadas</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btnLimpiarHist">
+          <i class="fas fa-trash"></i> Limpiar
+        </button>
+      </div>
+
+      <div class="hist-list" id="histList">
+        <div class="empty">
+          <i class="fas fa-clock-rotate-left"></i>
+          <p>No hay acciones registradas todavía.</p>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     MODAL — Nuevo / Editar producto
+════════════════════════════════════════════════════════ -->
+<div class="overlay" id="modalProducto">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">
+      <i class="fas fa-xmark"></i>
+    </button>
+
+    <div class="modal-title">
+      <i class="fas fa-box"></i>
+      <span id="modalTitulo">Nuevo producto</span>
+    </div>
+
+    <!-- ID oculto: vacío = nuevo, con valor = edición -->
+    <input type="hidden" id="fId" />
+
+    <div class="field">
+      <label>Nombre del producto *</label>
+      <input type="text" id="fNombre" placeholder='Ej: Monitor Samsung 24"' />
+      <div class="field-err" id="errNombre">El nombre es obligatorio.</div>
+    </div>
+
+    <div class="field">
+      <label>Categoría *</label>
+      <select id="fCat">
+        <option value="">— seleccioná una categoría —</option>
+        <option>Electrónica</option>
+        <option>Periféricos</option>
+        <option>Hardware</option>
+        <option>Almacenamiento</option>
+        <option>Redes</option>
+        <option>Accesorios</option>
+      </select>
+      <div class="field-err" id="errCat">Seleccioná una categoría.</div>
+    </div>
+
+    <div class="field">
+      <label>Proveedor *</label>
+      <input type="text" id="fProv" placeholder="Nombre del proveedor" />
+      <div class="field-err" id="errProv">El proveedor es obligatorio.</div>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Precio (ARS) *</label>
+        <input type="number" id="fPrecio" placeholder="0" min="0" />
+        <div class="field-err" id="errPrecio">Ingresá un precio válido.</div>
+      </div>
+      <div class="field">
+        <label>Stock *</label>
+        <input type="number" id="fStock" placeholder="0" min="0" />
+        <div class="field-err" id="errStock">Ingresá un stock válido.</div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="modalCancelar">Cancelar</button>
+      <button class="btn btn-primary" id="modalGuardar">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     MODAL — Confirmar eliminación
+════════════════════════════════════════════════════════ -->
+<div class="overlay" id="modalEliminar">
+  <div class="modal">
+    <div class="modal-title">
+      <i class="fas fa-trash" style="color:var(--red)"></i>
+      Eliminar producto
+    </div>
+    <p class="confirm-msg" id="elimMsg">¿Confirmás la eliminación?</p>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="elimCancelar">Cancelar</button>
+      <button class="btn btn-danger" id="elimConfirmar">Sí, eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     MODAL — Ajustar stock
+════════════════════════════════════════════════════════ -->
+<div class="overlay" id="modalStock">
+  <div class="modal">
+    <button class="modal-close" id="stockClose">
+      <i class="fas fa-xmark"></i>
+    </button>
+
+    <div class="modal-title">
+      <i class="fas fa-boxes-stacked"></i>
+      Ajustar stock
+    </div>
+
+    <p style="font-size:13px;color:var(--txt-2);margin-bottom:16px" id="stockInfo"></p>
+
+    <div class="field">
+      <label>Operación</label>
+      <select id="stockOp">
+        <option value="sumar">Sumar unidades</option>
+        <option value="restar">Restar unidades</option>
+        <option value="fijar">Fijar en valor exacto</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Cantidad</label>
+      <input type="number" id="stockCant" min="0" value="0" />
+      <div class="field-err" id="errStockCant">Ingresá una cantidad válida.</div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="stockCancelar">Cancelar</button>
+      <button class="btn btn-green" id="stockAplicar">Aplicar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     LIBRERÍAS EXTERNAS JS
+════════════════════════════════════════════════════════ -->
+
+<!-- SweetAlert2: disponible para confirmaciones opcionales -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Toastify: notificaciones no bloqueantes (reemplaza alert) -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<!-- Lógica principal de la aplicación -->
+<script src="./app.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+[
+  { "id": 1,  "nombre": "Monitor LG 27\"",          "categoria": "Electrónica",   "precio": 320000, "stock": 12, "proveedor": "TechDistrib S.A." },
+  { "id": 2,  "nombre": "Teclado Mecánico Redragon", "categoria": "Periféricos",   "precio": 85000,  "stock": 34, "proveedor": "GamerZone SRL"    },
+  { "id": 3,  "nombre": "Mouse Logitech MX Master",  "categoria": "Periféricos",   "precio": 95000,  "stock": 3,  "proveedor": "GamerZone SRL"    },
+  { "id": 4,  "nombre": "SSD Samsung 1TB",           "categoria": "Almacenamiento","precio": 145000, "stock": 18, "proveedor": "TechDistrib S.A." },
+  { "id": 5,  "nombre": "Memoria RAM Kingston 16GB", "categoria": "Hardware",      "precio": 78000,  "stock": 0,  "proveedor": "Componentes AR"   },
+  { "id": 6,  "nombre": "Gabinete NZXT H510",        "categoria": "Hardware",      "precio": 112000, "stock": 7,  "proveedor": "Componentes AR"   },
+  { "id": 7,  "nombre": "Auriculares HyperX Cloud II","categoria": "Periféricos",  "precio": 130000, "stock": 9,  "proveedor": "GamerZone SRL"    },
+  { "id": 8,  "nombre": "Placa de Video RTX 3060",   "categoria": "Hardware",      "precio": 580000, "stock": 2,  "proveedor": "TechDistrib S.A." },
+  { "id": 9,  "nombre": "Router TP-Link AX3000",     "categoria": "Redes",         "precio": 67000,  "stock": 15, "proveedor": "NetSolutions"     },
+  { "id": 10, "nombre": "Webcam Logitech C920",      "categoria": "Periféricos",   "precio": 55000,  "stock": 22, "proveedor": "GamerZone SRL"    },
+  { "id": 11, "nombre": "Hub USB-C Anker 7 en 1",    "categoria": "Accesorios",    "precio": 42000,  "stock": 0,  "proveedor": "NetSolutions"     },
+  { "id": 12, "nombre": "Disco HDD Seagate 2TB",     "categoria": "Almacenamiento","precio": 58000,  "stock": 11, "proveedor": "Componentes AR"   }
+]
