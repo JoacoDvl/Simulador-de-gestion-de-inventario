@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
  */
 async function cargarProductos() {
   try {
-    const respuesta = await fetch('./data/productos.json');
+    const respuesta = await fetch('./productos.json');
 
     if (!respuesta.ok) {
       throw new Error(`Error HTTP: ${respuesta.status}`);
